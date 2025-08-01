@@ -1,0 +1,116 @@
+0 verbose cli C:\Program Files\nodejs\node.exe C:\Users\Arzaan Ali Khan\AppData\Roaming\npm\node_modules\npm\bin\npm-cli.js
+1 info using npm@10.2.2
+2 info using node@v22.17.0
+3 timing npm:load:whichnode Completed in 2ms
+4 timing config:load:defaults Completed in 3ms
+5 timing config:load:file:C:\Users\Arzaan Ali Khan\AppData\Roaming\npm\node_modules\npm\npmrc Completed in 3ms
+6 timing config:load:builtin Completed in 3ms
+7 timing config:load:cli Completed in 1ms
+8 timing config:load:env Completed in 1ms
+9 timing config:load:file:C:\Users\Arzaan Ali Khan\OneDrive\Desktop\EA Crystal\my-app\.npmrc Completed in 0ms
+10 timing config:load:project Completed in 2ms
+11 timing config:load:file:C:\Users\Arzaan Ali Khan\.npmrc Completed in 0ms
+12 timing config:load:user Completed in 0ms
+13 timing config:load:file:C:\Users\Arzaan Ali Khan\AppData\Roaming\npm\etc\npmrc Completed in 0ms
+14 timing config:load:global Completed in 0ms
+15 timing config:load:setEnvs Completed in 0ms
+16 timing config:load Completed in 11ms
+17 timing npm:load:configload Completed in 11ms
+18 timing config:load:flatten Completed in 1ms
+19 timing npm:load:mkdirpcache Completed in 1ms
+20 timing npm:load:mkdirplogs Completed in 0ms
+21 verbose title npm install @tailwindcss/typography
+22 verbose argv "install" "@tailwindcss/typography" "--cache" ".\\temp-npm-cache"
+23 timing npm:load:setTitle Completed in 1ms
+24 timing npm:load:display Completed in 0ms
+25 verbose logfile logs-max:10 dir:C:\Users\Arzaan Ali Khan\OneDrive\Desktop\EA Crystal\my-app\temp-npm-cache\_logs\2025-08-01T05_58_00_459Z-
+26 verbose logfile C:\Users\Arzaan Ali Khan\OneDrive\Desktop\EA Crystal\my-app\temp-npm-cache\_logs\2025-08-01T05_58_00_459Z-debug-0.log
+27 timing npm:load:logFile Completed in 7ms
+28 timing npm:load:timers Completed in 0ms
+29 timing npm:load:configScope Completed in 0ms
+30 timing npm:load Completed in 33ms
+31 timing arborist:ctor Completed in 1ms
+32 silly logfile done cleaning log files
+33 timing idealTree:init Completed in 198ms
+34 timing idealTree:userRequests Completed in 1ms
+35 silly idealTree buildDeps
+36 silly fetch manifest @tailwindcss/typography@*
+37 timing arborist:ctor Completed in 0ms
+38 http fetch GET 200 https://registry.npmjs.org/@tailwindcss%2ftypography 248ms (cache miss)
+39 silly fetch manifest tailwindcss@^3.4.17
+40 http fetch GET 200 https://registry.npmjs.org/npm 524ms (cache miss)
+41 http fetch GET 200 https://registry.npmjs.org/tailwindcss 152ms (cache miss)
+42 silly placeDep ROOT @tailwindcss/typography@0.5.16 OK for: crystal-ai-assistant@1.0.0 want: *
+43 silly fetch manifest lodash.castarray@^4.4.0
+44 silly fetch manifest lodash.isplainobject@^4.0.6
+45 silly fetch manifest postcss-selector-parser@6.0.10
+46 http fetch GET 200 https://registry.npmjs.org/lodash.castarray 57ms (cache miss)
+47 http fetch GET 200 https://registry.npmjs.org/lodash.isplainobject 58ms (cache miss)
+48 http fetch GET 200 https://registry.npmjs.org/postcss-selector-parser 157ms (cache miss)
+49 timing idealTree:#root Completed in 601ms
+50 silly placeDep ROOT lodash.castarray@4.4.0 OK for: @tailwindcss/typography@0.5.16 want: ^4.4.0
+51 silly placeDep ROOT lodash.isplainobject@4.0.6 OK for: @tailwindcss/typography@0.5.16 want: ^4.0.6
+52 silly placeDep node_modules/@tailwindcss/typography postcss-selector-parser@6.0.10 OK for: @tailwindcss/typography@0.5.16 want: 6.0.10
+53 timing idealTree:node_modules/@tailwindcss/typography Completed in 3ms
+54 silly fetch manifest @google/generative-ai@^0.1.1
+55 http fetch GET 200 https://registry.npmjs.org/@google%2fgenerative-ai 82ms (cache miss)
+56 timing idealTree Completed in 891ms
+57 timing command:install Completed in 965ms
+58 notice
+58 notice New [31mmajor[39m version of npm available! [31m10.2.2[39m -> [32m11.5.2[39m
+58 notice Changelog: [36mhttps://github.com/npm/cli/releases/tag/v11.5.2[39m
+58 notice Run [32mnpm install -g npm@11.5.2[39m to update!
+58 notice
+59 verbose stack Error: could not resolve
+59 verbose stack     at PlaceDep.failPeerConflict (C:\Users\Arzaan Ali Khan\AppData\Roaming\npm\node_modules\npm\node_modules\@npmcli\arborist\lib\place-dep.js:503:25)
+59 verbose stack     at new PlaceDep (C:\Users\Arzaan Ali Khan\AppData\Roaming\npm\node_modules\npm\node_modules\@npmcli\arborist\lib\place-dep.js:157:21)
+59 verbose stack     at #buildDepStep (C:\Users\Arzaan Ali Khan\AppData\Roaming\npm\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\build-ideal-tree.js:933:18)
+59 verbose stack     at async Arborist.buildIdealTree (C:\Users\Arzaan Ali Khan\AppData\Roaming\npm\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\build-ideal-tree.js:196:7)
+59 verbose stack     at async Promise.all (index 1)
+59 verbose stack     at async Arborist.reify (C:\Users\Arzaan Ali Khan\AppData\Roaming\npm\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:159:5)
+59 verbose stack     at async Install.exec (C:\Users\Arzaan Ali Khan\AppData\Roaming\npm\node_modules\npm\lib\commands\install.js:152:5)
+59 verbose stack     at async module.exports (C:\Users\Arzaan Ali Khan\AppData\Roaming\npm\node_modules\npm\lib\cli-entry.js:61:5)
+60 verbose cwd C:\Users\Arzaan Ali Khan\OneDrive\Desktop\EA Crystal\my-app
+61 verbose Windows_NT 10.0.26100
+62 verbose node v22.17.0
+63 verbose npm  v10.2.2
+64 error code ERESOLVE
+65 error ERESOLVE could not resolve
+66 error
+67 error While resolving: [1mchromadb[22m@[1m1.10.5[22m
+67 error Found: [1m@google/generative-ai[22m@[1m0.17.2[22m[2m[22m
+67 error [2mnode_modules/@google/generative-ai[22m
+67 error   [1m@google/generative-ai[22m@"[1m^0.17.1[22m" from the root project
+67 error
+67 error Could not resolve dependency:
+67 error peerOptional [1m@google/generative-ai[22m@"[1m^0.1.1[22m" from [1mchromadb[22m@[1m1.10.5[22m[2m[22m
+67 error [2mnode_modules/chromadb[22m
+67 error   peerOptional [1mchromadb[22m@"[1m*[22m" from [1mlangchain[22m@[1m0.2.20[22m[2m[22m
+67 error   [2mnode_modules/langchain[22m
+67 error     [1mlangchain[22m@"[1m^0.2.11[22m" from the root project
+67 error   [1mchromadb[22m@"[1m^1.8.1[22m" from the root project
+67 error
+67 error Conflicting peer dependency: [1m@google/generative-ai[22m@[1m0.1.3[22m[2m[22m
+67 error [2mnode_modules/@google/generative-ai[22m
+67 error   peerOptional [1m@google/generative-ai[22m@"[1m^0.1.1[22m" from [1mchromadb[22m@[1m1.10.5[22m[2m[22m
+67 error   [2mnode_modules/chromadb[22m
+67 error     peerOptional [1mchromadb[22m@"[1m*[22m" from [1mlangchain[22m@[1m0.2.20[22m[2m[22m
+67 error     [2mnode_modules/langchain[22m
+67 error       [1mlangchain[22m@"[1m^0.2.11[22m" from the root project
+67 error     [1mchromadb[22m@"[1m^1.8.1[22m" from the root project
+67 error
+67 error Fix the upstream dependency conflict, or retry
+67 error this command with --force or --legacy-peer-deps
+67 error to accept an incorrect (and potentially broken) dependency resolution.
+68 error
+68 error
+68 error For a full report see:
+68 error C:\Users\Arzaan Ali Khan\OneDrive\Desktop\EA Crystal\my-app\temp-npm-cache\_logs\2025-08-01T05_58_00_459Z-eresolve-report.txt
+69 verbose exit 1
+70 timing npm Completed in 1361ms
+71 verbose unfinished npm timer reify 1754027880832
+72 verbose unfinished npm timer reify:loadTrees 1754027880902
+73 verbose unfinished npm timer idealTree:buildDeps 1754027881103
+74 verbose unfinished npm timer idealTree:node_modules/chromadb 1754027881708
+75 verbose code 1
+76 error A complete log of this run can be found in: C:\Users\Arzaan Ali Khan\OneDrive\Desktop\EA Crystal\my-app\temp-npm-cache\_logs\2025-08-01T05_58_00_459Z-debug-0.log

@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1753956770085,
+      "tag": "0001_perfect_shockwave",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1753959926438,
+      "tag": "0002_right_piledriver",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1753960278817,
+      "tag": "0003_slim_tag",
+      "breakpoints": true
+    }
+  ]
+}
