@@ -1,15 +1,18 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { getServerSession } from "next-auth"
+import { auth } from "@/lib/auth"
 import { performRAGQuery } from "@/lib/rag"
 import { generateResponse } from "@/lib/gemini"
-import { authOptions } from "../auth/[...nextauth]/route"
+import type { RAGResult } from "@/lib/rag"
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
+    const session = await auth()
     
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    if (!session?.user) {
+      return NextResponse.json(
+        { error: "Not authenticated" },
+        { status: 401 }
+      )
     }
 
     const { query, maxResults = 3 } = await request.json()
@@ -18,40 +21,25 @@ export async function POST(request: NextRequest) {
     }
 
     // Get relevant document chunks using RAG
-    const relevantChunks = await performRAGQuery(query, maxResults)
+    const ragResult = await performRAGQuery(query, session.user.id, maxResults)
     
-    if (!relevantChunks || relevantChunks.length === 0) {
+    if (ragResult.sources.length === 0) {
       // If no relevant chunks found, generate a response without context
-      const aiResponse = await generateResponse(query)
-      
+      const response = await generateResponse(query)
       return NextResponse.json({
-        response: aiResponse,
-        sources: [],
+        answer: response,
+        sources: []
       })
     }
 
-    // Format context from relevant chunks
-    const context = relevantChunks
-      .map(chunk => `Document: ${chunk.documentName}\n${chunk.content}`)
-      .join('\n\n')
+    // Generate a response using the retrieved context
+    const context = ragResult.sources.map(s => s.content).join('\n\n')
+    const response = await generateResponse(query, context)
 
-    // Generate AI response with context
-    const aiResponse = await generateResponse(query, context)
-
-    // Format sources for the frontend
-    const sources = relevantChunks.map(chunk => ({
-      documentId: chunk.documentId,
-      documentName: chunk.documentName,
-      content: chunk.content,
-      similarity: chunk.similarity,
-    }))
-
-    const result = {
-      response: aiResponse,
-      sources,
-    }
-
-    return NextResponse.json(result)
+    return NextResponse.json({
+      answer: response,
+      sources: ragResult.sources
+    })
   } catch (error) {
     console.error("RAG query error:", error)
     return NextResponse.json({ error: "Failed to process query" }, { status: 500 })

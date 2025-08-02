@@ -66,6 +66,30 @@ export function EnhancedDashboard() {
 
   useEffect(() => {
     fetchDashboardData()
+    
+    // Listen for email sync events to update the dashboard
+    const handleEmailsSynced = (event: CustomEvent) => {
+      const { detail: stats } = event;
+      setStats(prev => ({
+        ...prev,
+        emails: {
+          total: stats.total || 0,
+          unread: stats.unread || 0,
+          urgent: stats.urgent || 0,
+          creditCard: stats.creditCard || 0,
+        }
+      }));
+    };
+
+    // Add event listener
+    // @ts-ignore - CustomEvent type is not properly recognized
+    window.addEventListener('emailsSynced', handleEmailsSynced);
+
+    // Clean up the event listener
+    return () => {
+      // @ts-ignore - CustomEvent type is not properly recognized
+      window.removeEventListener('emailsSynced', handleEmailsSynced);
+    };
   }, [])
 
   const fetchDashboardData = async () => {
@@ -87,16 +111,35 @@ export function EnhancedDashboard() {
   }
 
   const fetchEmailStats = async () => {
-    // In real implementation, this would call the email API
-    setStats((prev) => ({
-      ...prev,
-      emails: {
-        total: 147,
-        unread: 23,
-        urgent: 5,
-        creditCard: 3,
-      },
-    }))
+    try {
+      const response = await fetch('/api/emails/stats');
+      if (!response.ok) {
+        throw new Error('Failed to fetch email stats');
+      }
+      const data = await response.json();
+      
+      setStats((prev) => ({
+        ...prev,
+        emails: {
+          total: data.total || 0,
+          unread: data.unread || 0,
+          urgent: data.urgent || 0,
+          creditCard: data.creditCard || 0,
+        },
+      }));
+    } catch (error) {
+      console.error('Error fetching email stats:', error);
+      // Fallback to mock data if API fails
+      setStats((prev) => ({
+        ...prev,
+        emails: {
+          total: 0,
+          unread: 0,
+          urgent: 0,
+          creditCard: 0,
+        },
+      }));
+    }
   }
 
   const fetchCalendarStats = async () => {

@@ -8,6 +8,7 @@ export const users = pgTable("users", {
   googleId: text("google_id").unique(),
   accessToken: text("access_token"),
   refreshToken: text("refresh_token"),
+  lastEmailSync: timestamp("last_email_sync"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

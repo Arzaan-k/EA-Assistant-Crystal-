@@ -92,7 +92,15 @@ export function EmailInterface() {
     try {
       // First sync emails
       console.log('Calling sync endpoint...')
-      const syncResponse = await fetch("/api/emails/sync", { method: "POST" })
+      const syncResponse = await fetch("/api/emails/sync", { 
+        method: "POST",
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0'
+        }
+      })
       console.log('Sync response status:', syncResponse.status)
       
       if (!syncResponse.ok) {
@@ -100,10 +108,29 @@ export function EmailInterface() {
         console.error('Sync error:', errorText)
         throw new Error(`Failed to sync emails: ${syncResponse.statusText}`)
       }
+
+      const syncData = await syncResponse.json()
+      console.log('Sync successful, emails processed:', syncData.emailsProcessed)
       
-      // Then fetch the updated list
+      // Update the dashboard stats if we have them
+      if (syncData.stats) {
+        // Dispatch a custom event that the dashboard can listen to
+        window.dispatchEvent(new CustomEvent('emailsSynced', { 
+          detail: syncData.stats 
+        }));
+      }
+      
+      // Then fetch the updated list with cache busting
       console.log('Fetching emails...')
-      const response = await fetch("/api/emails")
+      const timestamp = new Date().getTime(); // Cache buster
+      const response = await fetch(`/api/emails?t=${timestamp}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0'
+        }
+      })
       console.log('Fetch response status:', response.status)
       
       if (!response.ok) {
@@ -146,15 +173,21 @@ export function EmailInterface() {
   }
 
   const sortedEmails = useMemo(() => {
+    if (!emails.length) return [];
+    
     return [...emails].sort((a, b) => {
+      // Convert dates to timestamps for comparison
+      const timeA = a.date ? new Date(a.date).getTime() : 0;
+      const timeB = b.date ? new Date(b.date).getTime() : 0;
+      
       switch (sortBy) {
         case 'date-asc':
-          return a.date.getTime() - b.date.getTime();
+          return timeA - timeB;
         case 'from-asc':
-          return a.from.localeCompare(b.from);
+          return (a.from || '').localeCompare(b.from || '');
         case 'date-desc':
         default:
-          return b.date.getTime() - a.date.getTime();
+          return timeB - timeA;
       }
     });
   }, [emails, sortBy]);
