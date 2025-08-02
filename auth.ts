@@ -1,13 +1,27 @@
-import NextAuth from "next-auth"
-import GoogleProvider from "next-auth/providers/google"
+import NextAuth, { type NextAuthConfig, type Profile, type Session, type JWT } from "next-auth"
+import Google from "next-auth/providers/google"
 import { db } from "@/lib/db"
 import { users } from "@/lib/schema"
 import { eq } from "drizzle-orm"
 import { env } from "@/env"
+import { DrizzleAdapter } from "@auth/drizzle-adapter"
 
-export const authOptions = {
+declare module "next-auth" {
+  interface Session {
+    accessToken?: string
+    refreshToken?: string
+    error?: string
+    user: {
+      id: string
+    } & Session['user']
+  }
+}
+
+export const authConfig: NextAuthConfig = {
+  debug: process.env.NODE_ENV === 'development',
+  adapter: DrizzleAdapter(db),
   providers: [
-    GoogleProvider({
+    Google({
       clientId: env.GOOGLE_CLIENT_ID,
       clientSecret: env.GOOGLE_CLIENT_SECRET,
       authorization: {
@@ -15,41 +29,65 @@ export const authOptions = {
           prompt: "consent",
           access_type: "offline",
           response_type: "code",
-          scope: "https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/gmail.send https://www.googleapis.com/auth/gmail.readonly",
+          scope: [
+            'https://www.googleapis.com/auth/userinfo.profile',
+            'https://www.googleapis.com/auth/userinfo.email',
+            'https://www.googleapis.com/auth/calendar',
+            'https://www.googleapis.com/auth/gmail.send',
+            'https://www.googleapis.com/auth/gmail.readonly',
+            'https://www.googleapis.com/auth/gmail.modify',
+            'https://www.googleapis.com/auth/gmail.labels'
+          ].join(' '),
         },
       },
-      // From error message: redirect_uri=http://localhost:3000/api/auth/callback/google
-      // Make sure this matches EXACTLY what's in Google Cloud Console
-      redirectUri: "http://localhost:3000/api/auth/callback/google",
+      httpOptions: {
+        timeout: 10000,
+      },
     }),
   ],
   callbacks: {
     async signIn({ profile }) {
       if (!profile?.email?.endsWith("gmail.com")) {
-        return false
+        return false;
       }
-      return true
+      return true;
     },
     async session({ session, token }) {
-      if (session.user) {
-        const user = await db.query.users.findFirst({
-          where: eq(users.email, session.user.email!),
-        })
-        if (user) {
-          session.user.id = user.id
-        }
+      if (token) {
+        session.user.id = token.id as string;
+        session.accessToken = token.accessToken as string;
+        session.refreshToken = token.refreshToken as string;
+        session.error = token.error as string;
       }
-      return session
+      return session;
     },
     async jwt({ token, account, profile }) {
+      // Initial sign in
       if (account && profile) {
-        token.accessToken = account.access_token
-        token.refreshToken = account.refresh_token
-        
-        // Save or update user in database
-        const existingUser = await db.select().from(users).where(eq(users.email, profile.email!)).limit(1)
+        // Check if user exists in database
+        const [existingUser] = await db
+          .select()
+          .from(users)
+          .where(eq(users.email, profile.email as string));
 
-        if (existingUser.length > 0) {
+        if (!existingUser) {
+          // Create new user if doesn't exist
+          const [newUser] = await db
+            .insert(users)
+            .values({
+              email: profile.email as string,
+              name: profile.name || "",
+              googleId: profile.sub,
+              image: profile.picture,
+              emailVerified: new Date(),
+              accessToken: account.access_token,
+              refreshToken: account.refresh_token,
+            })
+            .returning();
+          
+          token.id = newUser.id;
+        } else {
+          // Update existing user
           await db
             .update(users)
             .set({
@@ -57,20 +95,16 @@ export const authOptions = {
               refreshToken: account.refresh_token,
               updatedAt: new Date(),
             })
-            .where(eq(users.id, existingUser[0].id))
-        } else {
-          await db
-            .insert(users)
-            .values({
-              email: profile.email!,
-              name: profile.name || "",
-              googleId: profile.sub,
-              accessToken: account.access_token,
-              refreshToken: account.refresh_token,
-            })
+            .where(eq(users.id, existingUser.id));
+          
+          token.id = existingUser.id;
         }
+
+        // Save tokens to JWT
+        if (account.access_token) token.accessToken = account.access_token;
+        if (account.refresh_token) token.refreshToken = account.refresh_token;
       }
-      return token
+      return token;
     },
   },
   pages: {
@@ -80,18 +114,13 @@ export const authOptions = {
   session: {
     strategy: "jwt",
   },
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: env.NEXTAUTH_SECRET,
+} satisfies NextAuthConfig;
+
+export const { handlers, auth, signIn, signOut } = NextAuth(authConfig);
+
+export async function getServerSession() {
+  return auth();
 }
 
-export const { auth, handlers, signIn, signOut } = NextAuth({
-  ...authOptions,
-  url: process.env.NEXTAUTH_URL,
-})
-
-// Export a function that can be used in middleware
-export const getSession = async (req: Request) => {
-  return await auth({ req })
-}
-
-// This is the recommended way to use Auth.js with Next.js 14 and Auth.js v5
-export const { GET, POST } = handlers
+export const getServerAuthSession = getServerSession;

@@ -3,9 +3,14 @@ import { neon } from "@neondatabase/serverless"
 import * as schema from "./schema"
 import { env } from "../env"
 
-// Create a singleton database connection
+// Create a database connection
 const sql = neon(env.DATABASE_URL)
-export const db = drizzle(sql, { schema: { ...schema } })
+
+// Create the Drizzle instance with schema
+export const db = drizzle(sql, { 
+  schema: { ...schema },
+  logger: process.env.NODE_ENV === 'development'
+})
 
 // Health check function
 export async function checkDatabaseConnection() {
